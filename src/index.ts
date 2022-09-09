@@ -1,12 +1,10 @@
 import express from "express";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
 
-import connection from "./transporter";
 import auth from "./authentication";
+import sendMail from "./sender";
 import logger from "./logger";
 
 const app = express();
-const transpoter = connection();
 
 const port = process.env.PORT || 3000;
 
@@ -21,28 +19,18 @@ app.post("/send", auth, async (req, res) => {
 		});
 	}
 
-	let email: SMTPTransport.SentMessageInfo;
+	const email = await sendMail(receiver, subject, text, html);
 
-	try {
-
-		email = await transpoter.sendMail({
-			to: receiver,
-			from: process.env.SENDER || "no-reply@analitycy.host",
-			subject,
-			text,
-			html: html ? html : text
-		});
-
-	} catch (err) {
-
-		logger.error(err);
+	if (email === 500) {
 		return res.status(500).json({
-			message: "Unable to send email"
+			message: "Internal server error"
 		});
-
+	} else {
+		return res.status(200).json({
+			message: "Email sent",
+			email
+		});
 	}
-
-	res.send(email);
 });
 
 app.listen(port, () => {
