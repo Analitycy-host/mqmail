@@ -19,8 +19,10 @@ async function sendMail(to: string, subject: string, text: string, html?: string
 		});
 
 	} catch (err) {
+
 		logger.error(err);
 		return 500;
+		
 	}
 
 	logger.child({
