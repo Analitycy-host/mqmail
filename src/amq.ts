@@ -1,20 +1,15 @@
 import amq from "amqplib";
 
-import logger from "./logger";
-
-const config = {
-	uri: process.env.AMQ_URI || "",
-	queue: process.env.AMQ_QUEUE || ""
-};
+import config from "./utils/config";
 
 export async function connect() {
 
-	const conn = await amq.connect(config.uri, {
+	const conn = await amq.connect(config.amqUri, {
 		heartbeat: 60
 	});
 		
 	const channel = await conn.createChannel();
-	await channel.assertQueue(config.queue, { durable: true });
+	await channel.assertQueue(config.amqQueue, { durable: true });
 
 	return channel;
 	

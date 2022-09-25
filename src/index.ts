@@ -5,12 +5,11 @@ import sendMail from "./sender";
 import { connect } from "./amq";
 import logger from "./logger";
 import { EmailMessage } from "./types";
+import config from "./utils/config";
 
 // Express portion
 
 const app = express();
-
-const port = process.env.PORT || 3000;
 
 app.use(
 	express.json()
@@ -41,15 +40,15 @@ app.post("/send", auth, async (req, res) => {
 	}
 });
 
-app.listen(port, () => {
-	logger.info(`Server is running on port ${port}`);
+app.listen(config.httpPort, () => {
+	logger.info(`Server is running on port ${config.httpPort}`);
 });
 
 // AMQ portion
 
 connect().then((channel) => {
 
-	channel.consume(process.env.AMQ_QUEUE || "", async (msg) => {
+	channel.consume(config.amqQueue, async (msg) => {
 		if (msg !== null) {
 			const email = msg.content.toString();
 			let parsedEmail: EmailMessage;

@@ -2,36 +2,26 @@ import nm from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import logger from "./logger";
-
-const config = {
-	host: process.env.SMTP_HOST || "",
-	port: parseInt(process.env.SMTP_PORT || "0"),
-	secure: (process.env.IS_SECURE === "true") || false,
-	user: process.env.SMTP_USER || "",
-	pass: process.env.SMTP_PASS || "",
-	dkim: process.env.DKIM_KEY || "",
-	keySelector: process.env.DKIM_SELECTOR || "",
-	domain: process.env.DOMAIN || ""
-};
+import config from "./utils/config";
 
 function connect(): nm.Transporter<SMTPTransport.SentMessageInfo> {
-	if (config.host === "" || config.port === 0) {
+	if (config.smtpHost === "" || config.smtpPort === 0) {
 		throw logger.fatal("SMTP host or port is not defined");
 	}
 
 	const transporter = nm.createTransport({
-		host: config.host,
-		port: config.port,
+		host: config.smtpHost,
+		port: config.smtpPort,
 		auth: {
-			user: config.user,
-			pass: config.pass,
+			user: config.smtpUser,
+			pass: config.smtpPass,
 		},
 		dkim: {
-			privateKey: config.dkim,
-			keySelector: config.keySelector,
+			privateKey: config.dkimKey,
+			keySelector: config.dkimSelector,
 			domainName: config.domain
 		},
-		secure: config.secure
+		secure: config.smtpSecure
 	});
 
 	if (!transporter || transporter instanceof Error) {

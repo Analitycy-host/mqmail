@@ -2,6 +2,7 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import connection from "./transporter";
 import logger from "./logger";
+import config from "./utils/config";
 
 const transpoter = connection();
 
@@ -11,7 +12,7 @@ async function sendMail(to: string, subject: string, text: string, html?: string
 	try {
 
 		email = await transpoter.sendMail({
-			from: process.env.SENDER || "no-reply@analitycy.host",
+			from: config.sender,
 			to,
 			subject,
 			text,

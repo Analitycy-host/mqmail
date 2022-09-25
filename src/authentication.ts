@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-const authToken = process.env.TOKEN || "8F3AE7CB-7ECB-48AE-A1B1-9FDE510548AE";
+import config from "./utils/config";
 
 export default function authentication(req: Request, res: Response, next: NextFunction) {
 	const token = req.headers.authorization?.split(" ");
@@ -10,7 +10,7 @@ export default function authentication(req: Request, res: Response, next: NextFu
 		});
 	}
 
-	if (token[1] !== authToken) {
+	if (token[1] !== config.httpAuth) {
 		return res.status(403).json({
 			message: "Not authorized"
 		});
